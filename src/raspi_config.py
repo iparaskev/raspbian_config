@@ -45,6 +45,7 @@ def prepare(img_path):
         img_path: Path to the image file.
     """
 
+    # Create folders
     status = create_folder(boot_path)
     if status:
         raise RuntimeError("Creation of boot folder failed"
