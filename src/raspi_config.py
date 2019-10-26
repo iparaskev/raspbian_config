@@ -5,6 +5,7 @@
 import argparse
 import os
 import subprocess
+from PyInquirer import prompt, print_json
 from constants import *
 
 
@@ -133,6 +134,33 @@ def clean_up():
     return subprocess.run(["rm", "-rf", tmp_path])
 
 
+def yes_no_question(attribute, message):
+    """Make a question about a feauture
+
+    Args:
+        attribute (str): The feature to be implemented.
+        message (str): The question to ask.
+
+    Return:
+        O for N 1 for Y
+    """
+
+    questions = [
+        {
+            'type': 'input',
+            'name': attribute,
+            'message': message + " Y/N [Y]",
+        }
+    ]
+    answers = prompt(questions)
+    
+    ret_val = 0
+    if answers[attribute] == "Y" or answers[attribute] == "":
+        ret_val = 1
+   
+    return ret_val
+
+
 if __name__ == "__main__":
     """Main programm"""
 
@@ -143,8 +171,10 @@ if __name__ == "__main__":
 
     # Get offsets of partitions.
     boot_offset, root_offset = process_fdisk_output(args.image)
-    #mount_partition(args.image, boot_path, boot_offset)
-    mount_partition(args.image, root_path, root_offset)
+
+    # Ask for ssh
+    status = yes_no_question("ssh", "Do you want to enable ssh")
+    print(status)
 
     # Clean up
     #status = clean_up()
