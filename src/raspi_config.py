@@ -174,7 +174,6 @@ if __name__ == "__main__":
 
     # Ask for ssh
     status = yes_no_question("ssh", "Do you want to enable ssh")
-    print(status)
 
     # Clean up
     #status = clean_up()
