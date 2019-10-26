@@ -181,6 +181,6 @@ if __name__ == "__main__":
     status = yes_no_question("ssh", "Do you want to enable ssh")
 
     # Clean up
-    #status = clean_up()
-    #if not status:
-    #    raise RuntimeError("Rm failed with exit status {}".format(status))
+    status = clean_up()
+    if not status:
+        raise RuntimeError("Rm failed with exit status {}".format(status))
