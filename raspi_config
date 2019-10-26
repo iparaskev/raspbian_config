@@ -6,7 +6,12 @@ import argparse
 import os
 import subprocess
 from PyInquirer import prompt, print_json
-from constants import *
+
+
+# Constants
+tmp_path = "tmp"
+root_path = tmp_path + "/" + "root"
+boot_path = tmp_path + "/" + "boot"
 
 
 def parse_args():
