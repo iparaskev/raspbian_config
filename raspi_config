@@ -160,10 +160,17 @@ def yes_no_question(attribute, message):
     answers = prompt(questions)
     
     ret_val = 0
+    answers[attribute] = answers[attribute].upper()
     if answers[attribute] == "Y" or answers[attribute] == "":
         ret_val = 1
    
     return ret_val
+
+
+def enable_ssh():
+    """Enable ssh on first boot."""
+    
+    subprocess.run(["sudo", "touch", boot_path + "/ssh"])
 
 
 if __name__ == "__main__":
@@ -179,6 +186,15 @@ if __name__ == "__main__":
 
     # Ask for ssh
     status = yes_no_question("ssh", "Do you want to enable ssh")
+    if status:
+        # Mount boot partition
+        mount_partition(args.image, boot_path, boot_offset)
+        
+        # Create ssh file
+        enable_ssh()
+
+        # Unmount boot partition
+        unmount(boot_path)
 
     # Clean up
     status = clean_up()
