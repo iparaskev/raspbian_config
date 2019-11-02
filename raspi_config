@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-"""raspi_config.py"""
+"""raspi_config"""
 
 import argparse
 import os
@@ -152,25 +152,25 @@ def yes_no_question(attribute, message):
 
     questions = [
         {
-            'type': 'input',
+            'type': 'confirm',
             'name': attribute,
-            'message': message + " Y/N [Y]",
+            'message': message,
+            'default': True
         }
     ]
     answers = prompt(questions)
-    
-    ret_val = 0
-    answers[attribute] = answers[attribute].upper()
-    if answers[attribute] == "Y" or answers[attribute] == "":
-        ret_val = 1
    
-    return ret_val
+    return answers[attribute]
 
 
 def enable_ssh():
     """Enable ssh on first boot."""
     
     subprocess.run(["sudo", "touch", boot_path + "/ssh"])
+
+
+def add_ssid_psk():
+    pass
 
 
 if __name__ == "__main__":
@@ -186,6 +186,7 @@ if __name__ == "__main__":
 
     # Ask for ssh
     status = yes_no_question("ssh", "Do you want to enable ssh")
+    print(status)
     if status:
         # Mount boot partition
         mount_partition(args.image, boot_path, boot_offset)
@@ -195,7 +196,10 @@ if __name__ == "__main__":
 
         # Unmount boot partition
         unmount(boot_path)
-
+    
+    # Add wifi
+    wf_status = yes_no_question("wifi", "Do you want to add wifi ssid and passwd")
+        
     # Clean up
     status = clean_up()
     if not status:
