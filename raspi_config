@@ -163,6 +163,21 @@ def yes_no_question(attribute, message):
     return answers[attribute]
 
 
+def get_input(attribute, message):
+    """Ask user for input"""
+
+    questions = [
+        {
+            'type': 'input',
+            'name': attribute,
+            'message': message,
+        }
+    ]
+    answers = prompt(questions)
+
+    return answers[attribute]
+
+
 def enable_ssh():
     """Enable ssh on first boot."""
     
@@ -185,8 +200,7 @@ if __name__ == "__main__":
     boot_offset, root_offset = process_fdisk_output(args.image)
 
     # Ask for ssh
-    status = yes_no_question("ssh", "Do you want to enable ssh")
-    print(status)
+    status = yes_no_question("ssh", "Do you want to enable ssh?")
     if status:
         # Mount boot partition
         mount_partition(args.image, boot_path, boot_offset)
@@ -198,8 +212,17 @@ if __name__ == "__main__":
         unmount(boot_path)
     
     # Add wifi
-    wf_status = yes_no_question("wifi", "Do you want to add wifi ssid and passwd")
+    ssid = None
+    wf_status = yes_no_question("wifi", "Connect to local wifi?")
+    if wf_status:
+        ssid = get_input("ssid", "Add ssid of wifi:")
+        psk = get_input("psk", "Add password of wifi:")
         
+    mount_status = wf_status
+    # If it needs to mount rootfs
+    if mount_status:
+        pass
+
     # Clean up
     status = clean_up()
     if not status:
