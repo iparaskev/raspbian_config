@@ -184,9 +184,21 @@ def enable_ssh():
     subprocess.run(["sudo", "touch", boot_path + "/ssh"])
 
 
-def add_ssid_psk():
-    pass
+def add_ssid_psk(ssid, psk):
+    """Add ssid and psk entry to /etc/wpa_supplicant/wpa_supplicant.conf file.
 
+    Args:
+        ssid: The ssid of wifi network.
+        psk: The password of the wifi network.
+    """
+    
+    new_network = \
+        "\\\n\\\nnetwork={{\\\n\\\tssid={}\\\n\\\tpsk={}\\\n}}".format(ssid, psk)
+
+    conf_path = root_path + "/etc/wpa_supplicant/wpa_supplicant.conf"
+    subprocess.run(["sudo", "sed", "-i", "-e",
+                    '$ a {}'.format(new_network), conf_path])
+    
 
 if __name__ == "__main__":
     """Main programm"""
@@ -201,6 +213,7 @@ if __name__ == "__main__":
 
     # Ask for ssh
     status = yes_no_question("ssh", "Do you want to enable ssh?")
+    status = 0
     if status:
         # Mount boot partition
         mount_partition(args.image, boot_path, boot_offset)
@@ -213,6 +226,7 @@ if __name__ == "__main__":
     
     # Add wifi
     ssid = None
+    psk = None
     wf_status = yes_no_question("wifi", "Connect to local wifi?")
     if wf_status:
         ssid = get_input("ssid", "Add ssid of wifi:")
@@ -221,7 +235,15 @@ if __name__ == "__main__":
     mount_status = wf_status
     # If it needs to mount rootfs
     if mount_status:
-        pass
+        # Mount boot partition
+        mount_partition(args.image, root_path, root_offset)
+
+        # Check for wifi
+        if wf_status:
+            add_ssid_psk(ssid, psk)
+
+        # Unmount root partition
+        unmount(root_path)
 
     # Clean up
     status = clean_up()
