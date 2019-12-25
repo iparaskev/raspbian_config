@@ -7,23 +7,6 @@ from questions import *
 from constants import *
 
 
-def parse_args():
-    """Initialize argument parser.
-
-    Returns:
-        An instance of argparse.Argument parser.
-    """
-
-    parser = argparse.ArgumentParser()
-    
-    # Add arguments
-    # Path to the image file, it is optional because it will give the option
-    # to download the image.
-    parser.add_argument("-img", "--image", help="path to the raspbian image")
-
-    return parser.parse_args()
-
-
 def create_folder(path):
     """Create a simple folder
 
@@ -200,3 +183,26 @@ def enable_avahi():
     subprocess.run(["sudo", "sed", "-i", 
                     "s/publish-workstation=no/publish-workstation=yes/",
                     conf_path])
+
+
+def change_hostname(hostname):
+    """Change hostname for the pi.
+
+    It modifies the /etc/hosts and /etc/hostname files.
+
+    Args:
+        hostname: The new hostname
+    """
+
+    conf_path = root_path + "/etc/hostname"
+
+    # get old hostname
+    old_host = subprocess.check_output(["cat", conf_path]).decode("utf-8")
+    old_host = old_host.strip("\n")
+
+    subprocess.run(["sudo", "sed", "-i",
+                    "s/{}/{}/".format(old_host, hostname), conf_path])
+
+    conf_path = root_path + "/etc/hosts"
+    subprocess.run(["sudo", "sed", "-i",
+                    "s/{}/{}/".format(old_host, hostname), conf_path])

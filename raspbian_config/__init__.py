@@ -52,14 +52,20 @@ if __name__ == "__main__":
     psk = None
     wf_status = yes_no_question("wifi", "Connect to local wifi?")
     if wf_status:
-        ssid = get_input("ssid", "Add ssid of wifi:")
-        psk = get_input("psk", "Add password of wifi:")
+        ssid = get_input("ssid", "Type ssid of wifi:")
+        psk = get_input("psk", "Type password of wifi:")
         
+    # Change hostname
+    host_status = yes_no_question("hostname", "Change hostname?")
+    host_status = 1
+    if host_status:
+        hostname = get_input("hostname", "Type new hostname:")
+
     # Enable avahi daemon
     avahi_status = yes_no_question("avahi", "Enable avahi daemon?")
     
     # Or the binary options 
-    mount_status = (wf_status | avahi_status)
+    mount_status = (wf_status | avahi_status | host_status)
 
     # If it needs to mount rootfs
     if mount_status:
@@ -69,6 +75,10 @@ if __name__ == "__main__":
         # Check for wifi
         if wf_status:
             add_ssid_psk(ssid, psk)
+        
+        # Change hostname
+        if host_status:
+            change_hostname(hostname)
 
         # Enable publish workstation of avahi daemon
         if avahi_status:
