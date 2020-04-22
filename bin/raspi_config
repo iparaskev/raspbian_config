@@ -1,0 +1,5 @@
+#!/usr/bin/env python
+
+import raspbian_config 
+
+raspbian_config.main()

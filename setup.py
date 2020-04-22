@@ -6,10 +6,11 @@ with open("README.md", "r") as fh:
 DEPENDENCIES = ['PyInquirer']
 
 setuptools.setup(
-    name='raspi_config',  
+    name='raspbian_config',
+    packages=['raspbian_config'],
     version='0.1',
     install_requires=DEPENDENCIES,
-    scripts=['raspi_config'],
+    scripts=['bin/raspi_config'],
 
     # Metadata
     author="Iasonas Paraskevopoulos",
