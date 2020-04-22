@@ -4,6 +4,7 @@ import argparse
 import os
 from .process_functions import *
 from .constants import *
+from .questions import *
 
 
 def parse_args():
@@ -18,7 +19,7 @@ def parse_args():
     # Add arguments
     # Path to the image file, it is optional because it will give the option
     # to download the image.
-    parser.add_argument("-img", "--image", help="path to the raspbian image")
+    parser.add_argument("img", help="path to the raspbian image")
     parser.add_argument("-i", "--interactive", help="use interactive option,"
                                                     " if this option is in use"
                                                     " the individual args are"
@@ -59,17 +60,17 @@ def main():
     args = parse_args()
 
     # Prepare folders
-    prepare(args.image)
+    prepare(args.img)
 
     # Get offsets of partitions.
-    boot_offset, root_offset = process_fdisk_output(args.image)
+    boot_offset, root_offset = process_fdisk_output(args.img)
 
     # Ask for ssh
     status = choose(args.interactive, yes_no_question,
                     ["ssh", "Do you want to enable ssh?"], args.ssh)
     if status:
         # Mount boot partition
-        mount_partition(args.image, boot_path, boot_offset)
+        mount_partition(args.img, boot_path, boot_offset)
 
         # Create ssh file
         enable_ssh()
@@ -108,7 +109,7 @@ def main():
     # If it needs to mount rootfs
     if mount_status:
         # Mount boot partition
-        mount_partition(args.image, root_path, root_offset)
+        mount_partition(args.img, root_path, root_offset)
 
         # Check for wifi
         if wf_status:

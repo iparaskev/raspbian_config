@@ -3,7 +3,7 @@
 import argparse
 import os
 import subprocess
-from .questions import *
+import time
 from .constants import *
 
 
@@ -105,6 +105,7 @@ def unmount(target_path):
         Status code of command.
     """
 
+    time.sleep(0.2)  # Sleep for settling permissions
     status = subprocess.run(["sudo", "umount", target_path])
     return status
 
@@ -113,45 +114,6 @@ def clean_up():
     """Clean up folders."""
 
     return subprocess.run(["rm", "-rf", tmp_path])
-
-
-def yes_no_question(attribute, message):
-    """Make a question about a feauture
-
-    Args:
-        attribute (str): The feature to be implemented.
-        message (str): The question to ask.
-
-    Return:
-        O for N 1 for Y
-    """
-
-    questions = [
-        {
-            'type': 'confirm',
-            'name': attribute,
-            'message': message,
-            'default': True
-        }
-    ]
-    answers = prompt(questions)
-
-    return answers[attribute]
-
-
-def get_input(attribute, message):
-    """Ask user for input"""
-
-    questions = [
-        {
-            'type': 'input',
-            'name': attribute,
-            'message': message,
-        }
-    ]
-    answers = prompt(questions)
-
-    return answers[attribute]
 
 
 def enable_ssh():
