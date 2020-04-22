@@ -2,8 +2,8 @@
 
 import argparse
 import os
-from process_functions import *
-from constants import *
+from .process_functions import *
+from .constants import *
 
 
 def parse_args():
@@ -19,7 +19,10 @@ def parse_args():
     # Path to the image file, it is optional because it will give the option
     # to download the image.
     parser.add_argument("-img", "--image", help="path to the raspbian image")
-    parser.add_argument("-i", "--interactive", help="use interactive option",
+    parser.add_argument("-i", "--interactive", help="use interactive option,"
+                                                    " if this option is in use"
+                                                    " the individual args are"
+                                                    " skipped",
                         action="store_true")
     parser.add_argument("--ssh", help="enable ssh", action="store_true")
     parser.add_argument("--avahi", help="enable avahi daemon",
@@ -50,7 +53,7 @@ def choose(int_flag, func, f_args, cli_arg):
     return ret
 
 
-if __name__ == "__main__":
+def main():
     """Main programm"""
 
     args = parse_args()

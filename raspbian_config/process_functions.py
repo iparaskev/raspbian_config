@@ -3,8 +3,8 @@
 import argparse
 import os
 import subprocess
-from questions import *
-from constants import *
+from .questions import *
+from .constants import *
 
 
 def create_folder(path):
@@ -58,7 +58,7 @@ def process_fdisk_output(img_path):
     return boot_offset, root_offset
 
 
-def prepare(img_path): 
+def prepare(img_path):
     """Create folder and mount image.
 
     Args:
@@ -135,7 +135,7 @@ def yes_no_question(attribute, message):
         }
     ]
     answers = prompt(questions)
-   
+
     return answers[attribute]
 
 
@@ -156,7 +156,7 @@ def get_input(attribute, message):
 
 def enable_ssh():
     """Enable ssh on first boot."""
-    
+
     subprocess.run(["sudo", "touch", boot_path + "/ssh"])
 
 
@@ -167,7 +167,7 @@ def add_ssid_psk(ssid, psk):
         ssid: The ssid of wifi network.
         psk: The password of the wifi network.
     """
-    
+
     new_network = \
         "\\\n\\\nnetwork={{\\\n\\\tssid={}\\\n\\\tpsk={}\\\n}}".format(ssid, psk)
 
@@ -180,7 +180,7 @@ def enable_avahi():
     """Enable publish workstation in avahi daemon config file."""
 
     conf_path = root_path + "/etc/avahi/avahi-daemon.conf"
-    subprocess.run(["sudo", "sed", "-i", 
+    subprocess.run(["sudo", "sed", "-i",
                     "s/publish-workstation=no/publish-workstation=yes/",
                     conf_path])
 
