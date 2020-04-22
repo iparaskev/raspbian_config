@@ -14,13 +14,40 @@ def parse_args():
     """
 
     parser = argparse.ArgumentParser()
-    
+
     # Add arguments
     # Path to the image file, it is optional because it will give the option
     # to download the image.
     parser.add_argument("-img", "--image", help="path to the raspbian image")
+    parser.add_argument("-i", "--interactive", help="use interactive option",
+                        action="store_true")
+    parser.add_argument("--ssh", help="enable ssh", action="store_true")
+    parser.add_argument("--avahi", help="enable avahi daemon",
+                        action="store_true")
+    parser.add_argument("--ssid", help="ssid of local network",
+                        type=str, default="")
+    parser.add_argument("--psk", help="password of local network",
+                        type=str, default="")
+    parser.add_argument("--hostname", help="change hostname",
+                        type=str, default="")
 
     return parser.parse_args()
+
+
+def choose(int_flag, func, f_args, cli_arg):
+    """Choose from the cli argument or the interactive flag
+
+    Args:
+        int_flag (bool): A flag indicating interactive input from user or not.
+        func (function): The question function.
+        f_args (dict): The arguments of the function.
+        cli_arg (): Variable from argparse.
+
+    Returns:
+        (any): The return value.
+    """
+    ret = func(*f_args) if int_flag else cli_arg
+    return ret
 
 
 if __name__ == "__main__":
@@ -35,36 +62,44 @@ if __name__ == "__main__":
     boot_offset, root_offset = process_fdisk_output(args.image)
 
     # Ask for ssh
-    status = yes_no_question("ssh", "Do you want to enable ssh?")
-    status = 0
+    status = choose(args.interactive, yes_no_question,
+                    ["ssh", "Do you want to enable ssh?"], args.ssh)
     if status:
         # Mount boot partition
         mount_partition(args.image, boot_path, boot_offset)
-        
+
         # Create ssh file
         enable_ssh()
 
         # Unmount boot partition
         unmount(boot_path)
-    
+
     # Add wifi
     ssid = None
     psk = None
-    wf_status = yes_no_question("wifi", "Connect to local wifi?")
+    wf_status = choose(args.interactive, yes_no_question,
+                       ["wifi", "Connect to local wifi?"],
+                       bool(args.psk or args.ssid))  # bool("") = False
     if wf_status:
-        ssid = get_input("ssid", "Type ssid of wifi:")
-        psk = get_input("psk", "Type password of wifi:")
-        
+        ssid = choose(args.interactive, get_input,
+                      ["ssid", "Type ssid of wifi:"], args.ssid)
+        psk = choose(args.interactive, get_input,
+                     ["psk", "Type password of wifi:"], args.psk)
+
     # Change hostname
-    host_status = yes_no_question("hostname", "Change hostname?")
-    host_status = 1
+    host_status = choose(args.interactive, yes_no_question,
+                         ["hostname", "Change hostname?"],
+                         bool(args.hostname))
     if host_status:
-        hostname = get_input("hostname", "Type new hostname:")
+        hostname = choose(args.interactive, get_input,
+                          ["hostname", "Type new hostname:"], args.hostname)
 
     # Enable avahi daemon
-    avahi_status = yes_no_question("avahi", "Enable avahi daemon?")
-    
-    # Or the binary options 
+    avahi_status = choose(args.interactive, yes_no_question,
+                          ["avahi", "Enable avahi daemon?"],
+                          bool(args.avahi))
+
+    # Or the binary options
     mount_status = (wf_status | avahi_status | host_status)
 
     # If it needs to mount rootfs
@@ -75,7 +110,7 @@ if __name__ == "__main__":
         # Check for wifi
         if wf_status:
             add_ssid_psk(ssid, psk)
-        
+
         # Change hostname
         if host_status:
             change_hostname(hostname)
